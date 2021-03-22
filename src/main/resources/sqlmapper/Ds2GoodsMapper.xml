@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.multidatasource.dao.Ds2GoodsDao">
+
+    <resultMap type="com.study.multidatasource.Pojo.Ds2Goods" id="Ds2GoodsResultMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+    </resultMap>
+
+    <sql id="table_field">
+      id, name, price      
+    </sql>
+
+    <!--通过Id查询单个-->
+    <select id="getById" resultMap="Ds2GoodsResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="table_field"/>
+        from ds2_goods
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+
+    <!--通过实体不为空的属性作为筛选条件查询列表-->
+    <select id="listByEntity" resultMap="Ds2GoodsResultMap" parameterType="com.study.multidatasource.Pojo.Ds2Goods">
+        select
+        <include refid="table_field"/>
+        from ds2_goods
+        <where>
+            <if test="id != null">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="name != null">
+                and name = #{name,jdbcType=VARCHAR}
+            </if>
+            <if test="price != null">
+                and price = #{price,jdbcType=NUMERIC}
+            </if>
+        </where>
+    </select>
+
+    <!--通过实体不为空的属性作为筛选条件查询单个-->
+    <select id="getByEntity" resultMap="Ds2GoodsResultMap" parameterType="com.study.multidatasource.Pojo.Ds2Goods">
+        select
+        <include refid="table_field"/>
+        from ds2_goods
+        <where>
+            <if test="id != null">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="name != null">
+                and name = #{name,jdbcType=VARCHAR}
+            </if>
+            <if test="price != null">
+                and price = #{price,jdbcType=NUMERIC}
+            </if>
+        </where>
+    </select>
+
+    <!--通过Id列表作为筛选条件查询列表，列表长度不为0-->
+    <select id="listByIds" resultMap="Ds2GoodsResultMap" parameterType="list">
+        select
+        <include refid="table_field"/>
+        from ds2_goods
+        where id in
+        <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--新增实体属性不为null的列-->
+    <insert id="insertSelective" keyProperty="id" useGeneratedKeys="true"
+            parameterType="com.study.multidatasource.Pojo.Ds2Goods">
+        insert into ds2_goods
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="price != null">
+                price,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="price != null">
+                #{price,jdbcType=NUMERIC},
+            </if>
+        </trim>
+    </insert>
+
+
+    <!--新增实体，注意：当实体属性为null时，对应的列也会插入为null，-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true"
+            parameterType="com.study.multidatasource.Pojo.Ds2Goods">
+             insert into ds2.ds2_goods(name, price)
+        values (#{name}, #{price})
+    </insert>
+
+
+    <!--批量新增所有列，列表长度不能为0，且列表id统一为null或者统一不为null-->
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true" parameterType="list">
+        insert into ds2.ds2_goods(name, price)
+        values
+        <foreach item="item" collection="list" separator="," open="" close="" index="index">
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                #{item.name,jdbcType=VARCHAR},
+                #{item.price,jdbcType=NUMERIC},
+            </trim>
+        </foreach>
+    </insert>
+
+    <!--通过主键修改实体属性不为null的列-->
+    <update id="updateByPrimaryKeySelective" parameterType="com.study.multidatasource.Pojo.Ds2Goods">
+        update ds2_goods
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="price != null">
+                price = #{price,jdbcType=NUMERIC},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--通过表字段修改实体属性不为null的列-->
+    <update id="updateByField">
+        update ds2_goods
+        <set>
+            <if test="where.name == null and set.name != null and set.name != ''">
+                name = #{set.name,jdbcType=VARCHAR},
+            </if>
+            <if test="where.price == null and set.price != null">
+                price = #{set.price,jdbcType=NUMERIC},
+            </if>
+        </set>
+        <where>
+            <if test="where.id != null">
+                and id = #{where.id,jdbcType=INTEGER}
+            </if>
+            <if test="where.name != null">
+                and name = #{where.name,jdbcType=VARCHAR}
+            </if>
+            <if test="where.price != null">
+                and price = #{where.price,jdbcType=NUMERIC}
+            </if>
+        </where>
+    </update>
+
+    <!--通过主键修改实体列表，列表长度不能为0，注意：当实体属性为null时，对应的列也会被更新为null-->
+    <update id="updateBatch" parameterType="list">
+        update ds2_goods
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="name = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.name}
+                </foreach>
+            </trim>
+            <trim prefix="price = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.price}
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item.id,jdbcType=INTEGER}
+        </foreach>
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from ds2_goods where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <!--通过实体非空属性删除-->
+    <delete id="deleteByEntity" parameterType="com.study.multidatasource.Pojo.Ds2Goods">
+        delete from ds2_goods
+        <where>
+            <if test="name != null">
+                and name = #{name,jdbcType=VARCHAR}
+            </if>
+            <if test="price != null">
+                and price = #{price,jdbcType=NUMERIC}
+            </if>
+        </where>
+    </delete>
+
+    <!--通过主键列表删除，列表长度不能为0-->
+    <delete id="deleteByIds" parameterType="list">
+        delete from ds2_goods where id in
+        <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="countAll" resultType="int">
+        select count(id) from ds2_goods
+    </select>
+
+    <select id="countByEntity" parameterType="com.study.multidatasource.Pojo.Ds2Goods" resultType="int">
+        select count(id) from ds2_goods
+        <where>
+            <if test="id != null">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="name != null">
+                and name = #{name,jdbcType=VARCHAR}
+            </if>
+            <if test="price != null">
+                and price = #{price,jdbcType=NUMERIC}
+            </if>
+        </where>
+    </select>
+</mapper>
